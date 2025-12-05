@@ -7,22 +7,29 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class TestListener extends ListenerAdapter 
 {
 
-    private MP3Player player = new MP3Player();
+    private MP3Player player;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
         if (event.getAuthor().isBot()) return;
-        // We don't want to respond to other bot accounts, including ourself
         Message message = event.getMessage();
         String content = message.getContentRaw(); 
-        // getContentRaw() is an atomic getter
-        // getContentDisplay() is a lazy getter which modifies the content for e.g. console view (strip discord formatting)
         if (content.startsWith("!miaou play"))
         {
             MessageChannel channel = event.getChannel();
-            channel.sendMessage("PLAYING SONG").queue(); // Important to call .queue() on the RestAction returned by sendMessage(...)
-            player.play("assets/victory.mp3");
+            String restOfMessage = content.substring("!miaou play".length()).trim();
+            channel.sendMessage(restOfMessage + " added to the playlist").queue();
+            if (player == null) {
+                player = new MP3Player(channel);
+            }
+            player.addToList("assets/" + restOfMessage + ".mp3");
+
+
+            if (!player.isPlaying()) {
+                player.play_list();
+            }
+
         }
     }
 }

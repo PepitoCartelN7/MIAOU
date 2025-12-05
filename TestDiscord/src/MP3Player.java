@@ -4,8 +4,18 @@ import java.util.ArrayList;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
  
 public class MP3Player {
+
+    private MessageChannel channel;
+    private boolean playing = false;
+
+    public MP3Player(MessageChannel channel) {
+        this.channel = channel;
+    }
 
     private ArrayList<String> playlist = new ArrayList<>();
 
@@ -19,23 +29,39 @@ public class MP3Player {
     }
 
 
-    public void play_list(){
+    public void play_list() {
+        playing = true;
+        new Thread(() -> {
+            String current;
+            while (!playlist.isEmpty()) {
+                current = playlist.getFirst();
+                channel.sendMessage(current + " is now playing").queue();
+                play(current);
+                playlist.remove(current);
+            }
+        }).start();
+        playing = false;
+    }
 
-        String current;
-        playlist.add("assets/victory.mp3");
-        playlist.add("assets/fly-me-to-the-moon-climax.mp3");
 
-        
-        while (!playlist.isEmpty()) {
+    public void addToList(String filename) {
+        playlist.add(filename);
+    }
 
-            current = playlist.getFirst();
-            System.out.println("PROUT1");
-            play(current);
-            playlist.remove(current);
-            System.out.println("PROUT2");
+    public boolean playlistEmpty() {
+        return playlist.isEmpty();
+    }
 
-        }
-     };
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+
+
 
     
 }
