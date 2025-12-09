@@ -8,11 +8,13 @@ public class TestListener extends ListenerAdapter
 {
 
     private MP3Player player;
+    private boolean prePlayList;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
         if (event.getAuthor().isBot()) return;
+        if (prePlayList) return;
         Message message = event.getMessage();
         String content = message.getContentRaw(); 
         if (content.startsWith("!miaou play"))
@@ -26,6 +28,7 @@ public class TestListener extends ListenerAdapter
             player.addToList("assets/" + restOfMessage + ".mp3");
 
 
+            System.out.println(player.isPlaying());
             if (!player.isPlaying()) {
                 player.play_list();
             }
