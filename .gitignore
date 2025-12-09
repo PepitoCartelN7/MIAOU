@@ -1,3 +1,9 @@
+bin/
+lib/
+include/
+lib64
+share/
 *.class
-bin/*
 *.token
+*.mp3
+pyvenv.cfg
