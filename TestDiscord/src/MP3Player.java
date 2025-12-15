@@ -30,17 +30,20 @@ public class MP3Player {
 
 
     public void play_list() {
+        String current;
         playing = true;
-        new Thread(() -> {
-            String current;
+        current = playlist.getFirst();
+        // Send message asynchronously, not blocking playback
+        channel.sendMessage(current + " is now playing").queue();
+        Thread playbackThread = new Thread(() -> {
             while (!playlist.isEmpty()) {
-                current = playlist.get(0);
-                channel.sendMessage(current + " is now playing").queue();
                 play(current);
                 playlist.remove(current);
             }
-        }).start();
-        playing = false;
+            playing = false;
+        });
+        playbackThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread highest priority
+        playbackThread.start();
     }
 
 
@@ -54,6 +57,10 @@ public class MP3Player {
 
     public boolean isPlaying() {
         return playing;
+    }
+
+    public ArrayList<String> getPlayList() {
+        return playlist;
     }
 
     public void setPlaying(boolean playing) {
