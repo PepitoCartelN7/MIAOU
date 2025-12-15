@@ -59,6 +59,10 @@ public class MP3Player {
         return playing;
     }
 
+    public ArrayList<String> getPlayList() {
+        return playlist;
+    }
+
     public void setPlaying(boolean playing) {
         this.playing = playing;
     }
