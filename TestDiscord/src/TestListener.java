@@ -17,16 +17,27 @@ public class TestListener extends ListenerAdapter
     {
         if (event.getAuthor().isBot()) return;
         if (prePlayList) return;
+
         Message message = event.getMessage();
         String content = message.getContentRaw(); 
         if (content.startsWith("!miaou playsong"))
-        {
+        {   
             MessageChannel channel = event.getChannel();
-            String restOfMessage = content.substring("!miaou play".length()).trim();
-            channel.sendMessage(restOfMessage + " added to the playlist").queue();
+
             if (player == null) {
                 player = new MP3Player(channel);
             }
+
+            if (player.isPlayingPreset()) {
+                channel.sendMessage("preset list already running, run \"!miaou stop\" before running this command").queue();
+                return;
+            }
+            
+            
+            String restOfMessage = content.substring("!miaou play".length()).trim();
+            channel.sendMessage(restOfMessage + " added to the playlist").queue();
+
+
             player.addToList("assets/" + restOfMessage + ".mp3");
 
 
@@ -64,14 +75,35 @@ public class TestListener extends ListenerAdapter
             channel.sendMessage(sb.toString()).queue();
         
         }
-        if (content.startsWith("!miaou preset")) {
+        if (content.startsWith("!miaou stop")) {
+            MessageChannel channel = event.getChannel();
+
+            if (player == null) {
+                channel.sendMessage("miaou not running").queue();
+                return;
+            }
+
+            player.stop();
 
         }
         if (content.startsWith("!miaou play_preset")) {
 
+            MessageChannel channel = event.getChannel();
             
+            if (player == null) {
+                player = new MP3Player(channel);
+            }
+
+            if (player.isPlayingPreset()) {
+                channel.sendMessage("participative list already running, run \"!miaou stop\" before running this command").queue();
+                return;
+            }
+            
+            player.play_preset();
 
         }
+
+
         
     }
 }       
