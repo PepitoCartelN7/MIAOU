@@ -34,7 +34,7 @@ public class MP3Player {
         new Thread(() -> {
             String current;
             while (!playlist.isEmpty()) {
-                current = playlist.getFirst();
+                current = playlist.get(0);
                 channel.sendMessage(current + " is now playing").queue();
                 play(current);
                 playlist.remove(current);
