@@ -7,3 +7,4 @@ share/
 *.token
 *.mp3
 pyvenv.cfg
+tmp/
