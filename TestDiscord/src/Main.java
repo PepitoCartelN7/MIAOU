@@ -9,7 +9,7 @@ public class Main {
         String token = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get("token.token")));
         JDA api = JDABuilder.createDefault(token)
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-            .addEventListeners(new TestListener())
+            .addEventListeners(new Bot())
             .build();
     }
     

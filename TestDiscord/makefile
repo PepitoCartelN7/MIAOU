@@ -2,7 +2,7 @@
 .PHONY: run
 
 compile:
-	javac -cp lib/JDA-6.1.2.jar:lib/jl1.0.1.jar:lib/vlcj-4.8.2.jar -d bin src/Main.java src/TestListener.java src/MP3Player.java
+	javac -cp lib/JDA-6.1.2.jar:lib/jl1.0.1.jar:lib/vlcj-4.8.2.jar -d bin src/Main.java src/Bot.java src/TestListener.java src/MP3Player.java
 
 
 
