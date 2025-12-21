@@ -1,17 +1,64 @@
-yt_dl_tool="yt-dlp"
+yt_dl_tool=yt-dlp
 path_dl=../assets/download
 tmp=./tmp
+playlist=$path_dl/playlist
 buf=buffer.tmp
 last=last.tmp
 ls1=ls1.tmp
 ls2=ls2.tmp
+list=playlits.tmp
 stack=stack.tmp
-oldest="foo.bar"
+common_args=" --no-warnings -q --progress"
+
+function test() {
+	playlist https://www.youtube.com/playlist?list=OLAK5uy_khpLE-udYbh0_G4LMicgD9OrSYdf3g-3U
+}
+
+
+function playlist() {
+	echo "playlist"
+	echo "cleaning previous playlist folder, following file will be removed"
+	echo $(ls $playlist)
+	rm $tmp/$last ; touch $tmp/$last
+	rm $playlist/*.mp3
+	$yt_dl_tool -e $1 $common_args > $tmp/$list
+	if [[ -z $(cat $tmp/$list) ]] then
+		echo "Error trying to find the playlist!"
+		return
+	fi
+	index=1
+	cat $tmp/$list | while read LINE; do
+		ls $playlist > $tmp/$ls1
+		#cleaning the name of the video to remove special character and replace space by _ .
+		name=${LINE//[^[:alnum] ]/}
+		name=${name// /_}.mp3
+		name=${name//__/_}
+		echo "Downloading music n°$index : $name"
+		$yt_dl_tool -t mp3 $1 -o $playlist/$name -I $index $common_args > $tmp/$stack; ls $playlist > $tmp/$ls2
+		if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
+			echo "Vid is downloaded here : $playlist/$name"
+			echo $name >> $tmp/$last
+			rm $tmp/$ls1; rm $tmp/$ls2
+			rm $tmp/$stack
+		else
+			echo "Something broke! Full stack below or in $stack ."
+			rm $tmp/$ls1; rm $tmp/$ls2
+			cat $tmp/$stack
+		fi
+		((index++))
+	done
+	echo "Whole playlist is downloaded"
+	echo "Exiting"
+	rm $tmp/$list
+}
 
 function init () {
 	echo "Initialisation ..."
 	mkdir $path_dl
+	rm $path_dl/*.mp3
 	mkdir $tmp
+	mkdir $playlist
+	rm $playlist/*.mp3
 	rm $tmp/$buf
 	touch $tmp/$buf
 	ver=$($yt_dl_tool --version)
@@ -28,7 +75,7 @@ function download () {
 	echo $1
 	ls $path_dl > $tmp/$ls1
 	#Récupération du nom de la vidéo grâce à yt-dlp -e.
-	name=$($yt_dl_tool -e $1)
+	name=$($yt_dl_tool -e $1 $common_args )
 	#-z $name vaut true si $name est vide i.e. il y a un problème.
 	if [[ -z $name ]] then
 		echo "Error trying to find the video!"
@@ -40,7 +87,7 @@ function download () {
 	name=${name// /_}.mp3
 	name=${name//__/_}
 	#Finally, the proper downloading of the video music.
-	$yt_dl_tool -t mp3 $1 -o $path_dl/$name > $tmp/$stack ; echo "Download finished."
+	$yt_dl_tool -t mp3 $1 -o $path_dl/$name $common_args > $tmp/$stack ; echo "Download finished."
 	#Verifying that everything worked as intended
 	ls $path_dl > $tmp/$ls2
 	if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
@@ -48,7 +95,6 @@ function download () {
 		echo $name >> $tmp/$buf
 		echo $name > $tmp/$last
 		rm $tmp/$ls1; rm $tmp/$ls2
-
 	else
 		echo "Something broke! Full stack below or in $stack ."
 		rm $tmp/$ls1; rm $tmp/$ls2
@@ -59,8 +105,9 @@ function download () {
 function clean() {
 	echo "Cleaning ..."
 	rm $path_dl/*.mp3
-	rm $tmp/*
+	rm $tmp/*.tmp
 	touch $tmp/$buf
+	rm $playlist/*.mp3
 }
 
 function update() {
@@ -88,15 +135,16 @@ function remove-oldest() {
 }
 
 function help() {
-	echo "Usage: $(basename $0) [-d URL] [-h] [-i] [-c] [-ro] [-u]"
+	echo "Usage: $(basename $0) [-d URL] [-h] [-i] [-c] [-ro] [-u] [-p URL [-s]]"
 	echo "Options:"
-	echo " -i, --init             prepare mandatory directories for the script to work."
-	echo " -u, --update           update yt-dlp, basicaly just run \"$yt_dl_tool -u\" ."
-	echo " -h, --help             Display this help message."
-	echo " -d, --download [URL]   Download the video from link [URL] in $path_dl folder, overwrite $tmp/$last with the file name."
-	echo " -c, --clean            empty $path_dl folder, and reset $tmp folder."
-	echo " -ro, --remove-oldest   remove the oldest downloaded element, to keep things tidy [Not Implemented]."
-	echo " -l, --license          diplay license information and some terms of service precisions (just use this script without reading like everybody)."
+	echo " -i, --init                 prepare mandatory directories for the script to work."
+	echo " -u, --update               update yt-dlp, basicaly just run \"$yt_dl_tool -u\" ."
+	echo " -h, --help                 Display this help message."
+	echo " -d, --download [URL]       Download the video from link [URL] in $path_dl folder, overwrite $tmp/$last with the file name."
+	echo " -c, --clean                empty $path_dl folder, and reset $tmp folder."
+	echo " -ro, --remove-oldest       remove the oldest downloaded element, to keep things tidy."
+	echo " -p, --playlist [URL] [-s]  download a playlist from URL in $path_dl folder, overwrite $tmp/$last with the list of song names."
+	echo " -l, --license              diplay license information and some terms of service precisions (just use this script without reading like everybody)."
 }
 
 case "$1" in
@@ -114,11 +162,15 @@ case "$1" in
 		clean ;;
 	"-ro" | "--remove-oldest")
 		remove-oldest ;;
+	"-p" | "--playlist")
+		#if [[ "$3" == "-s" || "$3" == "--shuffle" ]]; then $shuffle="--playlist-random"; else $shuffle=""; fi
+		playlist $2 ;; #$shuffle
 	"-l" | "--license")
 		license ;;
 	"")
+		test
 		echo "Error: You must provide at least one argument."
-		echo "Type $(basename $0) --help to see a list of all options..";;
+		echo "Type $(basename $0) --help to see a list of all options.";;
 	*)
 		echo "Unknown argument: $1" ;;
 esac
