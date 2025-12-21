@@ -25,24 +25,25 @@ function playlist() {
 	fi
 	index=1
 	cat $tmp/$list | while read LINE; do
-		ls $playlist > $tmp/$ls1
 		#cleaning the name of the video to remove special character and replace space by _ .
-		name=${LINE//[^[:alnum] ]/}
+		name=${LINE//[^[:alnum:] ]/}
 		name=${name// /_}.mp3
 		name=${name//__/_}
-		echo "Downloading music n°$index : $name"
-		$yt_dl_tool -t mp3 $1 -o $playlist/$name -I $index $common_args > $tmp/$stack; ls $playlist > $tmp/$ls2
-		if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
-			echo "Vid is downloaded here : $playlist/$name"
-			echo $name >> $tmp/$last
-			rm $tmp/$ls1; rm $tmp/$ls2
-			rm $tmp/$stack
-		else
-			echo "Something broke! Full stack below or in $stack ."
-			rm $tmp/$ls1; rm $tmp/$ls2
-			cat $tmp/$stack
-		fi
-		((index++))
+		while true; do
+			ls $playlist > $tmp/$ls1
+			echo "Downloading music n°$index : $name"
+			$yt_dl_tool -t mp3 $1 -o $playlist/$name -I $index $common_args > $tmp/$stack; ls $playlist > $tmp/$ls2
+			((index++))
+			if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]] then
+				echo "Vid is downloaded here : $playlist/$name"
+				break
+			else
+				echo ${name:0:${#name}-5}
+			fi
+		done
+		echo $name >> $tmp/$last
+		rm $tmp/$ls1; rm $tmp/$ls2
+		rm $tmp/$stack
 	done
 	echo "Whole playlist is downloaded"
 	echo "Exiting"
