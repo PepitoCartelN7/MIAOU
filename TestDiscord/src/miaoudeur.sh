@@ -10,11 +10,6 @@ list=playlits.tmp
 stack=stack.tmp
 common_args=" --no-warnings -q --progress"
 
-function test() {
-	playlist https://www.youtube.com/playlist?list=OLAK5uy_khpLE-udYbh0_G4LMicgD9OrSYdf3g-3U
-}
-
-
 function playlist() {
 	echo "playlist"
 	echo "cleaning previous playlist folder, following file will be removed"
