@@ -8,17 +8,17 @@ ls1=ls1.tmp
 ls2=ls2.tmp
 list=playlits.tmp
 stack=stack.tmp
-common_args=" --no-warnings -q --progress"
-
-# AGOUGAGAK
+cookies=../cookies.token
+common_args="--no-warnings -q --progress"
 
 function playlist() {
+	if [[ -z $2 ]]; then args=$common_args; else args="$common_args $2 --sleep-interval 5"; fi
 	echo "playlist"
 	echo "cleaning previous playlist folder, following file will be removed"
 	echo $(ls $playlist)
 	rm $tmp/$last ; touch $tmp/$last
 	rm $playlist/*.mp3
-	$yt_dl_tool -e $1 $common_args > $tmp/$list
+	$yt_dl_tool -e $1 $args > $tmp/$list
 	if [[ -z $(cat $tmp/$list) ]] then
 		echo "Error trying to find the playlist!"
 		return
@@ -32,7 +32,7 @@ function playlist() {
 		while true; do
 			ls $playlist > $tmp/$ls1
 			echo "Downloading music n°$index : $name"
-			$yt_dl_tool -t mp3 $1 -o $playlist/$name -I $index $common_args > $tmp/$stack; ls $playlist > $tmp/$ls2
+			$yt_dl_tool -t mp3 $1 -o $playlist/$name -I $index $args > $tmp/$stack; ls $playlist > $tmp/$ls2
 			((index++))
 			if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]] then
 				echo "Vid is downloaded here : $playlist/$name"
@@ -66,14 +66,21 @@ function init () {
 		echo "If yt-dlp is installed, try editing this file to put the proper path to ytdlp in the yt_dl_tool variable."
 		echo "If it is still not working : try crying very loudly, dipping you computer in the blood of a baby goat or, in absolutely last resort, contact me."
 	fi
+	cok=$(cat $cookies)
+	if [[ -z $cok ]] then
+		echo "Error, cookies file not founds."
+		echo "You won't be able to use the -m or --mature option."
+		echo "If you don't know how to setup cookies files, more informations here: https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies"
+		echo "Please keep in mind that using your account cookies to download youtube videos is a great way to get restricted it or banned."
+	fi
 }
 
 function download () {
-	echo "Downloading ..."
-	echo $1
+	if [[ -z $2 ]]; then args=$common_args; else args="$common_args $2"; fi
+	echo "Downloading : $1"
 	ls $path_dl > $tmp/$ls1
 	#Récupération du nom de la vidéo grâce à yt-dlp -e.
-	name=$($yt_dl_tool -e $1 $common_args )
+	name=$($yt_dl_tool -e $1 $args )
 	#-z $name vaut true si $name est vide i.e. il y a un problème.
 	if [[ -z $name ]] then
 		echo "Error trying to find the video!"
@@ -85,7 +92,7 @@ function download () {
 	name=${name// /_}.mp3
 	name=${name//__/_}
 	#Finally, the proper downloading of the video music.
-	$yt_dl_tool -t mp3 $1 -o $path_dl/$name $common_args > $tmp/$stack ; echo "Download finished."
+	$yt_dl_tool -t mp3 $1 -o $path_dl/$name $args > $tmp/$stack ; echo "Download finished."
 	#Verifying that everything worked as intended
 	ls $path_dl > $tmp/$ls2
 	if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
@@ -133,15 +140,18 @@ function remove-oldest() {
 }
 
 function help() {
-	echo "Usage: $(basename $0) [-d URL] [-h] [-i] [-c] [-ro] [-u] [-p URL [-s]]"
+	echo "Usage: $(basename $0) [-d URL [-m]] [-h] [-i] [-c] [-ro] [-u] [-p URL [-m]]"
 	echo "Options:"
 	echo " -i, --init                 prepare mandatory directories for the script to work."
 	echo " -u, --update               update yt-dlp, basicaly just run \"$yt_dl_tool -u\" ."
 	echo " -h, --help                 Display this help message."
-	echo " -d, --download [URL]       Download the video from link [URL] in $path_dl folder, overwrite $tmp/$last with the file name."
+	echo " -d, --download [URL] [-m]  Download the video from link [URL] in $path_dl folder, overwrite $tmp/$last with the file name."
+	echo "                            add -m or --mature to use cookies to be able to download age restricted videos [USE RESPONSIBLY]"
 	echo " -c, --clean                empty $path_dl folder, and reset $tmp folder."
 	echo " -ro, --remove-oldest       remove the oldest downloaded element, to keep things tidy."
-	echo " -p, --playlist [URL] [-s]  download a playlist from URL in $path_dl folder, overwrite $tmp/$last with the list of song names."
+	echo " -p, --playlist [URL] [-m]  download a playlist from URL in $path_dl folder, overwrite $tmp/$last with the list of song names."
+	echo "                            add -m or --mature to use cookies to be able to download age restricted videos [USE RESPONSIBLY] "
+	echo "                            Please note that this is also quite slower to (5sec of waiting between download request) to reduce risk"
 	echo " -l, --license              diplay license information and some terms of service precisions (just use this script without reading like everybody)."
 }
 
@@ -155,14 +165,15 @@ case "$1" in
 	"-h" | "--help")
 		help ;;
 	"-d" | "--download")
-		download $2;;
+		if [[ "$3" == "-m" || "$3" == "--mature" ]]; then cok="--cookies $cookies"; else cok=""; fi
+		download $2 "$cok";;
 	"-c" | "--clean")
 		clean ;;
 	"-ro" | "--remove-oldest")
 		remove-oldest ;;
 	"-p" | "--playlist")
-		#if [[ "$3" == "-s" || "$3" == "--shuffle" ]]; then $shuffle="--playlist-random"; else $shuffle=""; fi
-		playlist $2 ;; #$shuffle
+		if [[ "$3" == "-m" || "$3" == "--mature" ]]; then cok="--cookies $cookies"; else cok=""; fi
+		playlist $2 "$cok";;
 	"-l" | "--license")
 		license ;;
 	"")
