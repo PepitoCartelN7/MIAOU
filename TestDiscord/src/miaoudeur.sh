@@ -166,7 +166,6 @@ case "$1" in
 	"-l" | "--license")
 		license ;;
 	"")
-		test
 		echo "Error: You must provide at least one argument."
 		echo "Type $(basename $0) --help to see a list of all options.";;
 	*)
