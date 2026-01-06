@@ -6,10 +6,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Bot extends ListenerAdapter {
+
+
+	
+	private MP3Player player;
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
@@ -109,6 +114,20 @@ public class Bot extends ListenerAdapter {
 		event.getChannel().sendMessage("Miaou ! (Pong!)").queue();
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	@Command(description = "Affiche la liste de toutes les commandes disponibles")
 	private void Help(MessageReceivedEvent event) {
 		StringBuilder helpMessage = new StringBuilder("### __Miaou : (Les commandes disponibles sont:)__\n\n");
@@ -140,7 +159,9 @@ public class Bot extends ListenerAdapter {
 		event.getChannel().sendMessage(helpMessage.toString()).queue();
 	}
 
-	private MP3Player player;
+
+
+
 
 	@Command(description = "Ajoute un fichier MP3 à la playlist et le joue", args = "<filename>")
 	private void Play(MessageReceivedEvent event, String[] args) {
@@ -151,16 +172,132 @@ public class Bot extends ListenerAdapter {
 			return;
 		}
 
-		String filename = String.join(" ", args);
-		channel.sendMessage(filename + " added to the playlist").queue();
-
 		if (player == null) {
 			player = new MP3Player(channel);
 		}
-		player.addToList("assets/" + filename + ".mp3");
 
-		if (!player.isPlaying()) {
-			player.play_list();
-		}
+		if (player.isPlayingPreset()) {
+            channel.sendMessage("preset list already running, run \"!miaou stop\" before running this command").queue();
+            return;
+        }
+		
+
+        String youtubeUrl = String.join(" ", args);
+        channel.sendMessage("Downloading: " + youtubeUrl).queue();
+
+        
+        // Run miaoudeur.sh in a separate thread to avoid blocking
+        new Thread(() -> {
+            try {
+                // Get the absolute path to miaoudeur.sh
+                String projectRoot = System.getProperty("user.dir");
+				String scriptPath = new java.io.File(projectRoot, "src/miaoudeur.sh").getAbsolutePath();
+                
+                ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "-d", youtubeUrl);
+                pb.directory(new java.io.File(projectRoot));
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                
+                // Print script output for debugging
+                java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("[miaoudeur] " + line);
+                }
+                
+                int exitCode = process.waitFor();
+                System.out.println("ExitCode : " + exitCode);
+                
+                if (exitCode == 0) {
+                    // Read the downloaded filename from last.tmp
+                    String filename = new String(java.nio.file.Files.readAllBytes(
+                        java.nio.file.Paths.get(projectRoot + "/tmp/last.tmp"))).trim();
+
+                    player.setPlayingList(true);
+                    player.addToList("assets/download/" + filename);
+                    channel.sendMessage(filename + " added to the playlist").queue();
+
+                    if (!player.isPlaying()) {
+                        player.play_list();
+                    }
+                } else {
+                    channel.sendMessage("Failed to download the video. Please check the URL.").queue();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                channel.sendMessage("Error during download: " + e.getMessage()).queue();
+            }
+        }).start();
+	}
+
+
+
+
+	@Command(description = "Display la playlist")
+	private void ShowList(MessageReceivedEvent event, String[] args) {
+
+		MessageChannel channel = event.getChannel();
+
+    
+        if (player == null || player.getPlayList().isEmpty()) {
+            channel.sendMessage("The playlist is empty.").queue();
+            return;
+        }
+    
+        ArrayList<String> playlist = player.getPlayList();
+    
+        StringBuilder sb = new StringBuilder("**Playlist:**\n\n");
+        for (int i = 0; i < playlist.size(); i++) {
+            String song = playlist.get(i);
+        
+            
+            song = song.replace("assets/", "").replace(".mp3","");
+        
+            if (i == 0) {
+                sb.append("▶ **Currently playing:** ").append(song).append("\n");
+            } else {
+                sb.append(i).append(". ").append(song).append("\n");
+            }
+        }
+    
+        channel.sendMessage(sb.toString()).queue();
+    
+	}
+
+	@Command(description = "lance la playlist préenregistrée")
+	private void PreSetList(MessageReceivedEvent event, String[] args) {
+
+            MessageChannel channel = event.getChannel();
+            
+            if (player == null) {
+                player = new MP3Player(channel);
+            }
+
+            if (player.isPlayingPreset()) {
+                channel.sendMessage("participative list already running, run \"!miaou stop\" before running this command").queue();
+                return;
+            }
+
+			player.setPlayingPreset(true);
+            
+            player.play_preset();
+	}
+
+	@Command(description = "arrête tout")
+	private void Stop(MessageReceivedEvent event, String[] args) {
+
+            MessageChannel channel = event.getChannel();
+
+            if (player == null) {
+                channel.sendMessage("miaou not running").queue();
+                return;
+            }
+
+            player.stop();
+			player.setPlayingList(false);
+			player.setPlayingPreset(false);
+			channel.sendMessage("Music stopped").queue();
+
 	}
 }
+

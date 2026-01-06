@@ -17,6 +17,9 @@ public class MP3Player {
     private boolean playing = false;
 
     boolean playingPreset = false;
+    boolean playingList = false;
+
+
 
 
     Player player;
@@ -122,7 +125,18 @@ public class MP3Player {
     public void setPlayingPreset(boolean playingPreset) {
         this.playingPreset = playingPreset;
     }
+
+    public boolean isPlayingList() {
+        return playingList;
+    }
+
+    public void setPlayingList(boolean playingList) {
+        this.playingList = playingList;
+    }
+
     
+    
+
 
 
     

@@ -1,6 +1,6 @@
 yt_dl_tool=yt-dlp
-path_dl=../assets/download
-tmp=./tmp
+path_dl=assets/download
+tmp=./src/tmp
 playlist=$path_dl/playlist
 buf=buffer.tmp
 last=last.tmp
@@ -8,7 +8,7 @@ ls1=ls1.tmp
 ls2=ls2.tmp
 list=playlits.tmp
 stack=stack.tmp
-cookies=../cookies.token
+cookies=cookies.token
 common_args="--no-warnings -q --progress"
 
 function playlist() {
@@ -80,7 +80,8 @@ function download () {
 	echo "Downloading : $1"
 	ls $path_dl > $tmp/$ls1
 	#Récupération du nom de la vidéo grâce à yt-dlp -e.
-	name=$($yt_dl_tool -e $1 $args )
+	#name=$($yt_dl_tool -e $1 $args)
+	name=test
 	#-z $name vaut true si $name est vide i.e. il y a un problème.
 	if [[ -z $name ]] then
 		echo "Error trying to find the video!"

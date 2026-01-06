@@ -42,6 +42,7 @@ public class TestListener extends ListenerAdapter
 
 
             System.out.println(player.isPlaying());
+            
             if (!player.isPlaying()) {
                 player.play_list();
             }
