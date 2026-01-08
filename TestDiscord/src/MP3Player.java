@@ -74,6 +74,17 @@ public class MP3Player {
                 channel.sendMessage(current + " is now playing").queue();
                 play(current);
                 playlist.remove(current);
+                
+                // Run cleanup after song finishes
+                try {
+                    ProcessBuilder pb = new ProcessBuilder("bash", "./miaoudeur.sh", "-ro");
+                    pb.directory(new java.io.File(System.getProperty("user.dir"), "src"));
+                    pb.redirectErrorStream(true);
+                    Process process = pb.start();
+                    process.waitFor();
+                } catch (Exception e) {
+                    System.err.println("Error running cleanup command: " + e.getMessage());
+                }
             }
             playing = false;
         });
