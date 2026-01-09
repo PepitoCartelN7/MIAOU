@@ -11,7 +11,7 @@ ls1=ls1.tmp
 ls2=ls2.tmp
 list=playlits.tmp
 stack=stack.tmp
-cookies=cookies.token
+cookies=$src_dir/../cookies.token
 common_args="--no-warnings -q --no-progress"
 
 function playlist() {
