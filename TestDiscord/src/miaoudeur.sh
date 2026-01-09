@@ -1,6 +1,9 @@
-yt_dl_tool="../../bin/python3 ../../bin/yt-dlp"
-path_dl=../assets/download
-tmp=./tmp
+src_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+python="$src_dir/../../bin/python3"
+yt_dl_tool="$src_dir/../../bin/yt-dlp"
+path_dl="$src_dir/../assets/download"
+tmp="$src_dir/tmp"
 playlist=$path_dl/playlist
 buf=buffer.tmp
 last=last.tmp
@@ -59,7 +62,7 @@ function init () {
 	rm $playlist/*.mp3
 	rm $tmp/$buf
 	touch $tmp/$buf
-	ver=$($yt_dl_tool --version)
+	ver=$($python $yt_dl_tool --version)
 	if [[ -z $ver ]] then
 		echo "Error, yt-dlp is either not installed, or not correctly renseigned."
 		echo "If yt-dlp is not installed, please go there and follow the instructions https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#installation"
@@ -80,7 +83,7 @@ function download () {
 	echo "Downloading : $1"
 	ls $path_dl > $tmp/$ls1
 	#Récupération du nom de la vidéo grâce à yt-dlp -e.
-	name=$($yt_dl_tool -e $1 $args); echo $name
+	name=$($python $yt_dl_tool -e $1 $args); echo $name
 	#-z $name vaut true si $name est vide i.e. il y a un problème.
 	if [[ -z $name ]] then
 		echo "Error trying to find the video!"
@@ -92,7 +95,7 @@ function download () {
 	name=${name// /_}.mp3
 	name=${name//__/_}
 	#Finally, the proper downloading of the video music.
-	$yt_dl_tool -t mp3 $1 -o $path_dl/$name $args > $tmp/$stack ; echo "Download finished."
+	$python $yt_dl_tool -t mp3 $1 -o $path_dl/$name $args > $tmp/$stack ; echo "Download finished."
 	#Verifying that everything worked as intended
 	ls $path_dl > $tmp/$ls2
 	if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
@@ -117,7 +120,7 @@ function clean() {
 
 function update() {
 	echo "Updating ..."
-	$yt_dl_tool -U
+	$python $yt_dl_tool -U
 }
 
 function license() {
