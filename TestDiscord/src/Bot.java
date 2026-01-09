@@ -9,12 +9,16 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class Bot extends ListenerAdapter {
 
 
 	
 	private MP3Player player;
+	private Queue<String> download_queue = new LinkedList<>();
+	private boolean downloading = false;
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
@@ -183,46 +187,14 @@ public class Bot extends ListenerAdapter {
 	
 	    String youtubeUrl = String.join(" ", args);
 	    channel.sendMessage("Downloading: " + youtubeUrl).queue();
+
+		download_queue.add(youtubeUrl);
+
+		if (downloading == false) {
+			downloading = true;
+			Download(channel);
+		}
 	
-	    new Thread(() -> {
-	        try {
-	            String projectRoot = System.getProperty("user.dir");
-	            String scriptPath = new java.io.File(projectRoot, "src/miaoudeur.sh").getAbsolutePath();
-			
-	            // Run from src directory to ensure relative paths work
-	            ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "-d", youtubeUrl);
-	            pb.directory(new java.io.File(projectRoot, "src"));
-	            pb.redirectErrorStream(true);
-	            Process process = pb.start();
-			
-	            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
-	            String line;
-	            while ((line = reader.readLine()) != null) {
-	                System.out.println("[miaoudeur] " + line);
-	            }
-			
-	            int exitCode = process.waitFor();
-	            System.out.println("ExitCode : " + exitCode);
-			
-	            if (exitCode == 0) {
-	                String filename = new String(java.nio.file.Files.readAllBytes(
-	                    java.nio.file.Paths.get(projectRoot + "/src/tmp/last.tmp"))).trim();
-					
-	                player.setPlayingList(true);
-	                player.addToList("assets/download/" + filename);
-	                channel.sendMessage(filename + " added to the playlist").queue();
-					
-	                if (!player.isPlaying()) {
-	                    player.play_list();
-	                }
-	            } else {
-	                channel.sendMessage("Failed to download the video. Please check the URL.").queue();
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            channel.sendMessage("Error during download: " + e.getMessage()).queue();
-	        }
-	    }).start();
 	}
 
 
@@ -292,6 +264,56 @@ public class Bot extends ListenerAdapter {
 			player.setPlayingList(false);
 			player.setPlayingPreset(false);
 			channel.sendMessage("Music stopped").queue();
+
+	}
+
+
+	private void Download(MessageChannel channel) {
+
+		new Thread(() -> {
+			System.out.println("Le thread se lance");
+			while (!download_queue.isEmpty()) {
+				String currentUrl = download_queue.remove();
+	        	try {
+	        	    String projectRoot = System.getProperty("user.dir");
+	        	    String scriptPath = new java.io.File(projectRoot, "src/miaoudeur.sh").getAbsolutePath();
+				
+	        	    // Run from src directory to ensure relative paths work
+	        	    ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "-d", currentUrl);
+	        	    pb.directory(new java.io.File(projectRoot, "src"));
+	        	    pb.redirectErrorStream(true);
+	        	    Process process = pb.start();
+				
+	        	    java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
+	        	    String line;
+	        	    while ((line = reader.readLine()) != null) {
+	        	        System.out.println("[miaoudeur] " + line);
+	        	    }
+				
+	        	    int exitCode = process.waitFor();
+	        	    System.out.println("ExitCode : " + exitCode);
+				
+	        	    if (exitCode == 0) {
+	        	        String filename = new String(java.nio.file.Files.readAllBytes(
+	        	            java.nio.file.Paths.get(projectRoot + "/src/tmp/last.tmp"))).trim();
+						
+	        	        player.setPlayingList(true);
+	        	        player.addToList("assets/download/" + filename);
+	        	        channel.sendMessage(filename + " added to the playlist").queue();
+						
+	        	        if (!player.isPlaying()) {
+	        	            player.play_list();
+	        	        }
+	        	    } else {
+	        	        channel.sendMessage("Failed to download the video. Please check the URL.").queue();
+	        	    }
+	        	} catch (Exception e) {
+	        	    e.printStackTrace();
+	        	    channel.sendMessage("Error during download: " + e.getMessage()).queue();
+	        	}
+			}
+			this.downloading = false;
+	    }).start();
 
 	}
 }

@@ -40,7 +40,7 @@ public class MP3Player {
                 .forEach(presetlist::add);
                 Collections.reverse(presetlist);
         } catch (java.io.IOException e) {
-            System.out.println("Erreur quand on télecharge les fichier de presetlist");
+            System.out.println("Erreur quand on collecte les fichier de presetlist");
         }
 
 
