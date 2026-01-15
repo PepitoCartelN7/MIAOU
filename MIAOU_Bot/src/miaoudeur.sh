@@ -1,7 +1,7 @@
 src_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-python="$src_dir/../../bin/python3"
-yt_dl_tool="$src_dir/../../bin/yt-dlp"
+python="$src_dir/../bin/python3"
+yt_dl_tool="$src_dir/../bin/yt-dlp"
 path_dl="$src_dir/../assets/download"
 tmp="$src_dir/tmp"
 playlist=$path_dl/playlist

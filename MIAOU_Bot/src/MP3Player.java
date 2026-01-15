@@ -73,7 +73,7 @@ public class MP3Player {
         
         Thread playbackThread = new Thread(() -> {
             while ((!playlist.isEmpty()) && (playing == true)) {
-                String current = playlist.getFirst();  // ← Move this INSIDE the loop
+                String current = playlist.get(0);  // ← Move this INSIDE the loop
                 channel.sendMessage(current + " is now playing").queue();
                 play(current);
                 playlist.remove(0);  // ← Remove by index, more reliable
