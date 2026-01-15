@@ -19,7 +19,6 @@ while True:
     if (GPIO.input(portcapteur)==0 and allume):
         GPIO.output(portled,GPIO.LOW)
         print("detection fermeture")
-        print(pid)
         proc = subprocess.Popen("killall java", shell=True)
         allume = False
         
@@ -29,5 +28,3 @@ while True:
         proc = subprocess.Popen("make run", shell=True)
         print("detection ouverture")
     time.sleep(1)
-    print(GPIO.input(portcapteur))
-    print(allume)
