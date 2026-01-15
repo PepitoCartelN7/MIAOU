@@ -20,6 +20,7 @@ while True:
         GPIO.output(portled,GPIO.LOW)
         print("detection fermeture")
         proc = subprocess.Popen("killall java", shell=True)
+        proc = subprocess.Popen("bash src/miaoudeur.sh -c", shell="True")
         allume = False
         
     elif (not allume and GPIO.input(portcapteur)==1):

@@ -83,7 +83,7 @@ function download () {
 	echo "Downloading : $1"
 	ls $path_dl > $tmp/$ls1
 	#Récupération du nom de la vidéo grâce à yt-dlp -e.
-	name=$($python $yt_dl_tool -e $1 $args); echo $name
+	name=$($python $yt_dl_tool -e $1 $args --no-playlist ); echo $name
 	#-z $name vaut true si $name est vide i.e. il y a un problème.
 	if [[ -z $name ]] then
 		echo "Error trying to find the video!"
@@ -95,7 +95,7 @@ function download () {
 	name=${name// /_}.mp3
 	name=${name//__/_}
 	#Finally, the proper downloading of the video music.
-	$python $yt_dl_tool -t mp3 $1 -o $path_dl/$name $args > $tmp/$stack ; echo "Download finished."
+	$python $yt_dl_tool -t mp3 $1 -o $path_dl/$name $args --no-playlist > $tmp/$stack ; echo "Download finished."
 	#Verifying that everything worked as intended
 	ls $path_dl > $tmp/$ls2
 	if [[ $(diff $tmp/$ls1 $tmp/$ls2) == *$name* ]]; then
