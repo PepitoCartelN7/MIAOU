@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] arguments) throws Exception
     {
-        String token = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get("token.token")));
+        String token = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get("token.token"))).trim();
         JDA api = JDABuilder.createDefault(token)
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
             .addEventListeners(new Bot())
