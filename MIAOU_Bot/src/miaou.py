@@ -1,7 +1,10 @@
 import RPi.GPIO as GPIO
 import subprocess
 import time
+import sys, os
 
+path = os.path.dirname(sys.argv[0])
+os.chdir(path+"/../")
 portled = 21
 portcapteur = 18
 GPIO.setmode(GPIO.BCM)
@@ -11,8 +14,8 @@ print("super")
 allume = False
 GPIO.output(portled,GPIO.LOW)
 print("debut compilation")
-#proc = subprocess.Popen("make compile", shell=True)
-#proc.wait()
+proc = subprocess.Popen("make compile", shell=True)
+proc.wait()
 print("fin compilation")
 pid = 0;
 while True:
@@ -20,7 +23,7 @@ while True:
         GPIO.output(portled,GPIO.LOW)
         print("detection fermeture")
         proc = subprocess.Popen("killall java", shell=True)
-        proc = subprocess.Popen("bash src/miaoudeur.sh -c", shell="True")
+        proc = subprocess.Popen("bash /src/miaoudeur.sh -c", shell="True")
         allume = False
         
     elif (not allume and GPIO.input(portcapteur)==1):
