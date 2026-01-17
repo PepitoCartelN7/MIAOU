@@ -56,7 +56,7 @@ function playlist() {
 
 function init () {
 	echo "Initialisation ..."
-	mkdir $path_dl
+	mkdir $path_dl -p
 	rm $path_dl/*.mp3
 	mkdir $tmp
 	mkdir $playlist
