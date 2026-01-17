@@ -20,6 +20,8 @@ GPIO.output(portled,GPIO.LOW)
 proc = subprocess.Popen("make compile", shell=True)
 proc.wait()
 print("fin compilation")
+proc = subprocess.Popen("bash /src/miaoudeur.sh -i", shell="True")
+proc.wait()
 pid = 0;
 while True:
     if (GPIO.input(portcapteur)==0 and allume):

@@ -186,7 +186,7 @@ public class Bot extends ListenerAdapter {
 	    }
 	
 	    String youtubeUrl = String.join(" ", args);
-	    channel.sendMessage("Downloading: " + youtubeUrl).queue();
+	    channel.sendMessage("Downloading...").queue();
 
 		download_queue.add(youtubeUrl);
 
@@ -276,6 +276,10 @@ public class Bot extends ListenerAdapter {
 	            try {
 	                String projectRoot = System.getProperty("user.dir");
 	                String scriptPath = new java.io.File(projectRoot, "src/miaoudeur.sh").getAbsolutePath();
+
+
+					
+					String currentlast = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(projectRoot + "/src/tmp/last.tmp"))).trim();
 				
 	                // Run from src directory to ensure relative paths work
 	                ProcessBuilder pb = new ProcessBuilder("bash", scriptPath, "-d", currentUrl);
@@ -288,14 +292,16 @@ public class Bot extends ListenerAdapter {
 	                while ((line = reader.readLine()) != null) {
 	                    System.out.println("[miaoudeur] " + line);
 	                }
-				
+					
 	                int exitCode = process.waitFor();
 	                System.out.println("ExitCode : " + exitCode);
-				
+					
 	                // Add a small delay to ensure file is fully written
 	                Thread.sleep(500);
-				
-	                if (exitCode == 0) {
+
+					String newlast = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(projectRoot + "/src/tmp/last.tmp"))).trim();
+					
+	                if (exitCode == 0 && !(currentlast.equalsIgnoreCase(newlast))) {
 	                    String filename = new String(java.nio.file.Files.readAllBytes(
 	                        java.nio.file.Paths.get(projectRoot + "/src/tmp/last.tmp"))).trim();
 						

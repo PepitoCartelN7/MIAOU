@@ -63,6 +63,7 @@ function init () {
 	rm $playlist/*.mp3
 	rm $tmp/$buf
 	touch $tmp/$buf
+	touch $tmp/$last
 	ver=$($python $yt_dl_tool --version)
 	if [[ -z $ver ]] then
 		echo "Error, yt-dlp is either not installed, or not correctly renseigned."
