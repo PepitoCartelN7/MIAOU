@@ -17,14 +17,14 @@ allume = False
 proc = subprocess.Popen("make compile", shell=True)
 proc.wait()
 print("fin compilation")
-proc = subprocess.Popen("bash /src/miaoudeur.sh -i", shell="True")
+proc = subprocess.Popen("bash ./src/miaoudeur.sh -i", shell="True")
 proc.wait()
 pid = 0;
 while True:
     if (GPIO.input(portcapteur)==0 and allume):
         print("detection fermeture")
         proc = subprocess.Popen("killall java", shell=True)
-        proc = subprocess.Popen("bash /src/miaoudeur.sh -c", shell="True")
+        proc = subprocess.Popen("bash ./src/miaoudeur.sh -c", shell="True")
         allume = False
 
     elif (not allume and GPIO.input(portcapteur)==1):
