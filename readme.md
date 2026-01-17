@@ -33,6 +33,7 @@ Télécharger et ajouter les fichiers suivant dans MIAOU/MIAOU_Bot/lib/ (Maven/G
 - `okio-2.8.0.jar`
 - `eslf4j-api-1.7.36.jar`
 - `trove4j-3.0.3.jar`
+- Une version de tous ces jar est disponible dans le MIAOU/MIAOU_Bot/lib/ de ce repo (ce n'est pas clone automatiquement)
 ### Lancement du Bot discord
 1 - Ajouter un fichier token.token dans le dossier MIAOU_Bot contenant le token de connexion du bot discord.
 
