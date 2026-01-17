@@ -29,6 +29,7 @@ function playlist() {
 	index=1
 	cat $tmp/$list | while read LINE; do
 		#cleaning the name of the video to remove special character and replace space by _ .
+		#prout jp
 		name=${LINE//[^[:alnum:] ]/}
 		name=${name// /_}.mp3
 		name=${name//__/_}
