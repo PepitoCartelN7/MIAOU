@@ -2,13 +2,13 @@ import RPi.GPIO as GPIO
 import subprocess
 import time
 import sys, os
-import git
+#import git
 
 
 path = os.path.dirname(sys.argv[0])
 os.chdir(path+"/../")
-g = git.cmd.Git("./../")
-g.pull()
+#g = git.cmd.Git("./../")
+#g.pull()
 
 portcapteur = 18
 GPIO.setmode(GPIO.BCM)
