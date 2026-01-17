@@ -1,4 +1,7 @@
 # Miaou Is An Orchestral Unifier
+
+L'idée de M.I.A.O.U est de permettre à de multiples utilisateurs de contrôler collaborativement un même dispositif sonore normalement connecté par un unique câble jack. M.I.A.O.U permet aussi de se connecter à un dispositif (P.E.P.I.T.O par ex) permettant de savoir si la pièce contenant le système de son est occupée. On peut ainsi d'arrêter automatiquement la musique quand personne n'est là pour l'écouter.
+
 ## Procédure d'instalation : M.I.A.O.U
 ### Initialisation du raspberry py
 1 - Se munir d'un raspberry.
