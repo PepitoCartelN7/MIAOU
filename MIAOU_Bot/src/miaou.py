@@ -4,6 +4,7 @@ import time
 import sys, os
 import git
 
+
 path = os.path.dirname(sys.argv[0])
 os.chdir(path+"/../")
 g = git.cmd.Git("./../")
@@ -14,10 +15,8 @@ portcapteur = 18
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(portled,GPIO.OUT,initial=GPIO.LOW)
 GPIO.setup(portcapteur,GPIO.IN,pull_up_down = GPIO.PUD_UP)
-print("super")
 allume = False
 GPIO.output(portled,GPIO.LOW)
-print("debut compilation")
 proc = subprocess.Popen("make compile", shell=True)
 proc.wait()
 print("fin compilation")
@@ -29,7 +28,7 @@ while True:
         proc = subprocess.Popen("killall java", shell=True)
         proc = subprocess.Popen("bash /src/miaoudeur.sh -c", shell="True")
         allume = False
-        
+
     elif (not allume and GPIO.input(portcapteur)==1):
         GPIO.output(portled,GPIO.HIGH)
         allume = True
