@@ -3,7 +3,7 @@
 ### Initialisation du raspberry py
 1 - Se munir d'un raspberry.
 
-2 - Le câbler comme suit [![schema_du_projet.jpg]].
+2 - Le câbler comme suit ![schema_du_projet.jpg](./schema_du_projet.jpg).
 
 3 - Après avoir connecté le raspberry à internet, cloner ce repository dessus.
 
