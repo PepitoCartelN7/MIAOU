@@ -3,7 +3,7 @@
 ### Initialisation du raspberry py
 1 - Se munir d'un raspberry.
 
-2 - Le câbler comme suit ![schema_du_projet.jpg](./Schéma_du_projet.jpg).
+2 - Le câbler comme suit : ![schema_du_projet.jpg](./Schéma_du_projet.jpg)
 
 3 - Après avoir connecté le raspberry à internet, cloner ce repository dessus.
 
@@ -34,11 +34,11 @@ Télécharger et ajouter les fichiers suivant dans MIAOU/MIAOU_Bot/lib/ (Maven/G
 - `eslf4j-api-1.7.36.jar`
 - `trove4j-3.0.3.jar`
 ### Lancement du Bot discord
-1 - Ajouter un fichier token.token dans le dossier MIAOU_Bot contenant le token de connexion du bot discord
+1 - Ajouter un fichier token.token dans le dossier MIAOU_Bot contenant le token de connexion du bot discord.
 
-2 - Utiliser le liens d'invitation fournis à la création du Bot discord pour inviter le bot sur votre serveur favoris
+2 - Utiliser le liens d'invitation fournis à la création du Bot discord pour inviter le bot sur votre serveur favoris.
 
-3 - Lancer le bot grace à la commande `/bin/python /src/miaou.py`
+3 - Lancer le bot grace à la commande `/bin/python /src/miaou.py`.
 
-4 - Profitez (Utiliser `!miaou help` dans un channel discord visible par le bot pour en savoir plus sur les fonctionalités de MIAOU) 
+4 - Profitez. (Utiliser `!miaou help` dans un channel discord visible par le bot pour en savoir plus sur les fonctionalités de MIAOU).
 
