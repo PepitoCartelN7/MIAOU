@@ -29,7 +29,6 @@ function playlist() {
 	index=1
 	cat $tmp/$list | while read LINE; do
 		#cleaning the name of the video to remove special character and replace space by _ .
-		#prout jp
 		name=${LINE//[^[:alnum:] ]/}
 		name=${name// /_}.mp3
 		name=${name//__/_}
@@ -128,7 +127,7 @@ function update() {
 function license() {
 	echo "This is open-source I guess, I am too lazy to do otherwise."
 	echo "yt-dlp is free and in the public domain, more info here : https://github.com/yt-dlp/yt-dlp?tab=Unlicense-1-ov-file#readme"
-	echo "Please note that using third party tools (like this script to download content) is against youtube terms of service."
+	echo "Please note that using third party tools (like this script) to download youtube content is against youtube terms of service."
 	echo "Not that I care obviously, but it's important to note, and more importantly, it's a lot funnier when it's illegal."
 	echo "This was made with the help of a lot of random post on StackOverflow from people I'm too lazy to credit."
 }
