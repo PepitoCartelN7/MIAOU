@@ -2,11 +2,16 @@
 ## Procédure d'instalation : M.I.A.O.U
 ### Initialisation du raspberry py
 1 - Se munir d'un raspberry.
-2 - Le câbler comme suit [[schema_du_projet.jpg]]
+
+2 - Le câbler comme suit [[schema_du_projet.jpg]].
+
 3 - Après avoir connecté le raspberry à internet, cloner ce repository dessus.
+
 4 - Verifiez que sur le raspberry pi que python3 et java17 soient fonctionnels.
+
 ### Installation des dépendances
 1 - Dépendances de python : 
+
 Executer les commandes suivantes dans le dossier MIAOU/MIAOU_Bot:
 `python3 -m venv .`
 `bin/pip install gitpython`
