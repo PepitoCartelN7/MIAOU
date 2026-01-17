@@ -9,7 +9,13 @@ import java.nio.file.*;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
- 
+
+/**
+ * Lecteur MP3 pour la lecture de fichiers audio dans le bot Discord MIAOU.
+ * 
+ * Cette classe gère la lecture de fichiers MP3 via le channel discord ou la commande a été faite
+ * on peut jouer des musiques ainsi qu'une liste de lecture préenregistrée.
+ */
 public class MP3Player {
 
     private MessageChannel channel;
@@ -27,6 +33,14 @@ public class MP3Player {
 
     private ArrayList<String> presetlist = new ArrayList<>();
 
+    /**
+     * Construit une nouvelle instance de MP3Player.
+     * 
+     * Initialise le lecteur avec le canal cible et charge la liste de présélections
+     * à partir du répertoire "assets/preset_playlist".
+     *
+     * @param channel le canal Discord où la commande du bot a été envoyée
+     */
     public MP3Player(MessageChannel channel) {
         this.channel = channel;
 
@@ -45,8 +59,13 @@ public class MP3Player {
 
     }
 
-    
-
+    /**
+     * Joue un fichier MP3.
+     * <p>
+     * Arrête la lecture actuelle (si elle existe) et commence la lecture du nouveau fichier.
+     *
+     * @param filename le chemin d'accès au fichier MP3 à jouer
+     */
     public synchronized void play(String filename) {
         try {
             if (player != null) {
@@ -59,6 +78,12 @@ public class MP3Player {
         }
     }
 
+    /**
+     * Arrête la lecture audio en cours.
+     * <p>
+     * Ferme le lecteur et met à jour les états de lecture.
+     * NE MARCHE PAS POUR L'INSTANT TODO
+     */
     public synchronized void stop() {
         if (player != null) {
             player.close();
@@ -68,6 +93,12 @@ public class MP3Player {
     }
 
 
+    /**
+     * Joue tous les fichiers de la liste de lecture participative dans un thread séparé.
+     * <p>
+     * Parcourt la liste de lecture participative et joue chaque fichier séquentiellement
+     * Exécute un script de nettoyage après chaque chanson.
+     */
     public void play_list() {
         playing = true;
         
@@ -95,6 +126,11 @@ public class MP3Player {
         playbackThread.start();
     }
 
+    /**
+     * Joue tous les fichiers de la liste préenregistrée dans un thread séparé.
+     * <p>
+     * Parcourt la liste préenregistrée et joue chaque fichier séquentiellement.
+     */
     public void play_preset() {
                 playingPreset = true;
                 Thread playbackThread = new Thread(() -> {
@@ -111,7 +147,11 @@ public class MP3Player {
                 playbackThread.start();
     }
 
-
+    /**
+     * Ajoute un fichier à la liste de lecture.
+     *
+     * @param filename le chemin d'accès du fichier MP3 à ajouter
+     */
     public void addToList(String filename) {
         playlist.add(filename);
     }
@@ -120,29 +160,36 @@ public class MP3Player {
         return playlist.isEmpty();
     }
 
+
     public boolean isPlaying() {
         return playing;
     }
+
 
     public ArrayList<String> getPlayList() {
         return playlist;
     }
 
+
     public void setPlaying(boolean playing) {
         this.playing = playing;
     }
+
 
     public boolean isPlayingPreset() {
         return playingPreset;
     }
 
+
     public void setPlayingPreset(boolean playingPreset) {
         this.playingPreset = playingPreset;
     }
 
+
     public boolean isPlayingList() {
         return playingList;
     }
+
 
     public void setPlayingList(boolean playingList) {
         this.playingList = playingList;

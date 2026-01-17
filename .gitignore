@@ -8,4 +8,5 @@ share/
 *.mp3
 pyvenv.cfg
 tmp/
+lib/
 

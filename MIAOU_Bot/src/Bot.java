@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
 
+/**
+ * Gestionnaire d'événements Discord pour le bot MIAOU.
+ * <p>
+ * Cette classe gère les messages reçus sur Discord et route les commandes
+ * vers les méthodes appropriées en utilisant l'annotation @Command.
+ */
 public class Bot extends ListenerAdapter {
 
 
@@ -19,8 +25,14 @@ public class Bot extends ListenerAdapter {
 	private MP3Player player;
 	private Queue<String> download_queue = new LinkedList<>();
 	private boolean downloading = false;
-
-	@Override
+	/**
+	 * Traite les messages reçus sur Discord.
+	 * <p>
+	 * Écoute les messages commençant par "!miaou" et dirige les commandes
+	 * vers les méthodes annotées avec @Command correspondantes.
+	 *
+	 * @param event l'événement de message reçu
+	 */	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 		if (event.getAuthor().isBot())
 			return;
@@ -107,11 +119,21 @@ public class Bot extends ListenerAdapter {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	private @interface Command {
+		/**
+		 * Description de la commande (affichée dans l'aide).
+		 */
 		String description() default "No description provided";
 
+		/**
+		 * Arguments attendus par la commande (affichés dans l'aide).
+		 */
 		String args() default "";
 	}
 
+	/**
+	 * Commande Ping - répond avec Pong!
+	 * @param event l'événement du message reçu
+	 */
 	@Command(description = "Répond avec Pong!")
 	private void Ping(MessageReceivedEvent event) {
 		System.out.println("Pong!");
@@ -132,6 +154,13 @@ public class Bot extends ListenerAdapter {
 
 
 
+	/**
+	 * Commande Help - affiche la liste de toutes les commandes disponibles.
+	 * Génère un message formaté contenant toutes les commandes avec leurs
+	 * descriptions et arguments attendus.
+	 *
+	 * @param event l'événement du message reçu
+	 */
 	@Command(description = "Affiche la liste de toutes les commandes disponibles")
 	private void Help(MessageReceivedEvent event) {
 		StringBuilder helpMessage = new StringBuilder("### __Miaou : (Les commandes disponibles sont:)__\n\n");
@@ -167,6 +196,14 @@ public class Bot extends ListenerAdapter {
 
 
 
+	/**
+	 * Commande Play - télécharge et ajoute un fichier à la playlist.
+	 * Accepte une URL YouTube, la télécharge en MP3, l'ajoute à la liste de lecture
+	 * et commence la lecture si aucune autre n'est en cours.
+	 *
+	 * @param event l'événement du message reçu
+	 * @param args les arguments de la commande (URL YouTube)
+	 */
 	@Command(description = "Ajoute un fichier MP3 à la playlist et le joue", args = "<filename>")
 	private void Play(MessageReceivedEvent event, String[] args) {
 	    MessageChannel channel = event.getChannel();
@@ -200,6 +237,14 @@ public class Bot extends ListenerAdapter {
 
 
 
+	/**
+	 * Commande ShowList - affiche la liste de lecture actuelle.
+	 * Affiche les fichiers en attente de lecture avec la piste actuellement
+	 * en lecture mise en évidence.
+	 *
+	 * @param event l'événement du message reçu
+	 * @param args les arguments de la commande (non utilisés)
+	 */
 	@Command(description = "Display la playlist")
 	private void ShowList(MessageReceivedEvent event, String[] args) {
 
@@ -231,6 +276,14 @@ public class Bot extends ListenerAdapter {
     
 	}
 
+	/**
+	 * Commande PreSetList - lance la liste de présélections préenregistrée.
+	 * Joue tous les fichiers contenus dans le répertoire de présélections
+	 * de manière séquentielle.
+	 *
+	 * @param event l'événement du message reçu
+	 * @param args les arguments de la commande (non utilisés)
+	 */
 	@Command(description = "lance la playlist préenregistrée")
 	private void PreSetList(MessageReceivedEvent event, String[] args) {
 
@@ -250,6 +303,13 @@ public class Bot extends ListenerAdapter {
             player.play_preset();
 	}
 
+	/**
+	 * Commande Stop - arrête la lecture audio en cours.
+	 * Arrête la lecture de musique et la liste de lecture en cours.
+	 *
+	 * @param event l'événement du message reçu
+	 * @param args les arguments de la commande (non utilisés)
+	 */
 	@Command(description = "arrête tout")
 	private void Stop(MessageReceivedEvent event, String[] args) {
 
@@ -268,6 +328,14 @@ public class Bot extends ListenerAdapter {
 	}
 
 
+	/**
+	 * Traite la file de téléchargement en arrière-plan.
+	 * Lance un script de téléchargement pour chaque URL dans la file d'attente,
+	 * puis ajoute les fichiers téléchargés à la liste de lecture.
+	 * S'exécute dans un thread séparé.
+	 *
+	 * @param channel le canal Discord pour envoyer les notifications
+	 */
 	private void Download(MessageChannel channel) {
 	    new Thread(() -> {
 	        System.out.println("Le thread se lance");
