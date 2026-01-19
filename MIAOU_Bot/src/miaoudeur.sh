@@ -115,6 +115,7 @@ function clean() {
 	echo "Cleaning ..."
 	rm $path_dl/*.mp3
 	rm $tmp/*.tmp
+	touch $tmp/$last
 	touch $tmp/$buf
 	rm $playlist/*.mp3
 }
